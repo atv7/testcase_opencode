@@ -25,7 +25,8 @@ def calculate_expression(expression_str, variables):
             free_symbols = []
             for i in expression.free_symbols:
                 free_symbols.append(i)
-            raise TypeError(f"Не хватает переменной {free_symbols}")
+            alpha_list = ", ".join(f"'{alpha}'" for alpha in free_symbols)
+            raise TypeError(f"Требуемая переменная {alpha_list} не определена")
         result = float(expression)
         return result
     except ValueError:

@@ -86,57 +86,58 @@ def parse(expression):
 
 
 def rpn_calc(formula, values):
-    list_of_values = []
-    alpha_names = []
+    expression = []
+    free_symbols = []
     for lex in formula:
         if lex[0].isalpha():
             if lex in ["lg", "ln", "sin", "cos", "tan", "asin", "acos", "atan"]:
                 continue
             try:
                 if lex[0] not in values.keys():
-                    alpha_names.append(formula[formula.index(lex[0])])
+                    free_symbols.append(formula[formula.index(lex[0])])
                 formula[formula.index(lex[0])] = str(values.get(lex[0]))
             except ValueError:
                 raise ValueError('Неверное выражение')
     for lex in formula:
         if lex in ["lg", "ln", "sin", "cos", "tan", "asin", "acos", "atan"]:
-            list_of_values.append(lex)
+            expression.append(lex)
         if lex[0].isdigit():
-            list_of_values.append(float(lex))
+            expression.append(float(lex))
         elif lex == 'None':
-            raise TypeError(f"Не хватает переменной {alpha_names}")
+            alpha_list = ", ".join(f"'{alpha}'" for alpha in free_symbols)
+            raise TypeError(f"Требуемая переменная {alpha_list} не определена")
         elif lex in ["+", "-", "*", "/", "^", "lg", "ln", "sin", "cos", "tan", "asin", "acos", "atan"]:
-            a2 = list_of_values.pop()
-            a1 = list_of_values.pop()
+            a2 = expression.pop()
+            a1 = expression.pop()
             match lex:
                 case '+':
-                    list_of_values.append(a1 + a2)
+                    expression.append(a1 + a2)
                 case '-':
-                    list_of_values.append(a1 - a2)
+                    expression.append(a1 - a2)
                 case '*':
-                    list_of_values.append(a1 * a2)
+                    expression.append(a1 * a2)
                 case '/':
-                    list_of_values.append(a1 / a2)
+                    expression.append(a1 / a2)
                 case '^':
-                    list_of_values.append(math.pow(a1, a2))
+                    expression.append(math.pow(a1, a2))
                 case 'lg':
-                    list_of_values.append(math.log10(a1))
+                    expression.append(math.log10(a1))
                 case 'ln':
-                    list_of_values.append(math.log(a1))
+                    expression.append(math.log(a1))
                 case 'sin':
-                    list_of_values.append(math.sin(a1))
+                    expression.append(math.sin(a1))
                 case 'cos':
-                    list_of_values.append(math.cos(a1))
+                    expression.append(math.cos(a1))
                 case 'tan':
-                    list_of_values.append(math.tan(a1))
+                    expression.append(math.tan(a1))
                 case 'asin':
-                    list_of_values.append(math.asin(a1))
+                    expression.append(math.asin(a1))
                 case 'acos':
-                    list_of_values.append(math.acos(a1))
+                    expression.append(math.acos(a1))
                 case 'atan':
-                    list_of_values.append(math.atan(a1))
+                    expression.append(math.atan(a1))
 
-    return list_of_values.pop()
+    return expression.pop()
 
 
 @router.post("/")
