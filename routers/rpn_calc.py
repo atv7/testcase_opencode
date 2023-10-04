@@ -3,15 +3,15 @@ from models import ExpressionInput
 import math
 
 router = APIRouter(
-    prefix="/npm_calc",
-    tags=["npm_calc"],
+    prefix="/rpn_calc",
+    tags=["rpn_calc"],
     responses={401: {"description": "not found"}}
 )
 
 
-def rpn(s):
+def rpn(expression):
     """Алгоритм для вычисления формулы в обратной польской записи с использованием стека"""
-    lex = parse(s)
+    lex = parse(expression)
     s2 = []
     r = []
     operators = ["+", "-", "*", "/", "(", ")", "^", "lg", "ln", "sin", "cos", "tan", "asin", "acos", "atan"]
@@ -60,18 +60,18 @@ def priority(operation):
         return 0
 
 
-def parse(s):
+def parse(expression):
     operators = ["+", "-", "*", "/", "(", ")", "^", "lg", "ln", "sin", "cos", "tan", "asin", "acos", "atan"]
     lex = []
     tmp = ""
     i = 0
-    while i < len(s):
-        a = s[i]
+    while i < len(expression):
+        a = expression[i]
         if a != " ":
             if a in operators:
                 if tmp != "":
                     lex += [tmp]
-                if a == "^" and (i + 1 < len(s) and s[i + 1] == "-"):
+                if a == "^" and (i + 1 < len(expression) and expression[i + 1] == "-"):
                     lex += ["^"]
                     i += 1
                 else:
@@ -86,7 +86,7 @@ def parse(s):
 
 
 def rpn_calc(formula, values):
-    s = []
+    list_of_values = []
     alpha_names = []
     for lex in formula:
         if lex[0].isalpha():
@@ -100,46 +100,46 @@ def rpn_calc(formula, values):
                 raise ValueError('Неверное выражение')
     for lex in formula:
         if lex in ["lg", "ln", "sin", "cos", "tan", "asin", "acos", "atan"]:
-            s.append(lex)
+            list_of_values.append(lex)
         if lex[0].isdigit():
-            s.append(float(lex))
+            list_of_values.append(float(lex))
         elif lex == 'None':
             raise TypeError(f"Не хватает переменной {alpha_names}")
         elif lex in ["+", "-", "*", "/", "^", "lg", "ln", "sin", "cos", "tan", "asin", "acos", "atan"]:
-            a2 = s.pop()
-            a1 = s.pop()
+            a2 = list_of_values.pop()
+            a1 = list_of_values.pop()
             match lex:
                 case '+':
-                    s.append(a1 + a2)
+                    list_of_values.append(a1 + a2)
                 case '-':
-                    s.append(a1 - a2)
+                    list_of_values.append(a1 - a2)
                 case '*':
-                    s.append(a1 * a2)
+                    list_of_values.append(a1 * a2)
                 case '/':
-                    s.append(a1 / a2)
+                    list_of_values.append(a1 / a2)
                 case '^':
-                    s.append(math.pow(a1, a2))
+                    list_of_values.append(math.pow(a1, a2))
                 case 'lg':
-                    s.append(math.log10(a1))
+                    list_of_values.append(math.log10(a1))
                 case 'ln':
-                    s.append(math.log(a1))
+                    list_of_values.append(math.log(a1))
                 case 'sin':
-                    s.append(math.sin(a1))
+                    list_of_values.append(math.sin(a1))
                 case 'cos':
-                    s.append(math.cos(a1))
+                    list_of_values.append(math.cos(a1))
                 case 'tan':
-                    s.append(math.tan(a1))
+                    list_of_values.append(math.tan(a1))
                 case 'asin':
-                    s.append(math.asin(a1))
+                    list_of_values.append(math.asin(a1))
                 case 'acos':
-                    s.append(math.acos(a1))
+                    list_of_values.append(math.acos(a1))
                 case 'atan':
-                    s.append(math.atan(a1))
+                    list_of_values.append(math.atan(a1))
 
-    return s.pop()
+    return list_of_values.pop()
 
 
-@router.post("/npm_calc/")
+@router.post("/")
 async def calculate_expression(expression_input: ExpressionInput):
     expression = expression_input.expression
     variables = expression_input.variables
