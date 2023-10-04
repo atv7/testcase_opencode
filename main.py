@@ -3,6 +3,7 @@ from routers import rpn_calc, sympy_calc
 
 app = FastAPI()
 
+
 @app.get('/')
 async def root():
     return {"status_code": 200, "description":

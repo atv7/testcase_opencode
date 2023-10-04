@@ -8,7 +8,9 @@ router = APIRouter(
     responses={401: {"description": "not found"}}
 )
 
+
 def calculate_expression(expression_str, variables):
+    """Вычисление формулы с использованием библиотеки sympy"""
     try:
         expression = sympy.sympify(expression_str)
     except sympy.SympifyError:
